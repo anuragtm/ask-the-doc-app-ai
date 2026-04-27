@@ -58,19 +58,23 @@ with st.form("question_form", clear_on_submit=False):
     openai_api_key = st.text_input(
         "OpenAI API Key",
         type="password",
-        disabled=not (uploaded_file and query_text))
+        disabled=not (uploaded_file and query_text)
+    )
 
     submitted = st.form_submit_button(
         "Submit",
-        disabled=not (uploaded_file and query_text))
+        disabled=not (uploaded_file and query_text)
+    )
 
     if submitted:
         if not openai_api_key.startswith("sk-"):
             st.error("Please enter a valid OpenAI API key.")
         else:
             with st.spinner("Generating answer..."):
-    try:
-        answer = generate_response(uploaded_file, openai_api_key, query_text)
-        st.info(answer)
-    except Exception as e:
-        st.error(f"{type(e).__name__}: {e}")
+                try:
+                    answer = generate_response(uploaded_file, openai_api_key, query_text)
+                    st.info(answer)
+                except Exception as e:
+                    st.error(f"{type(e).__name__}: {e}")
+
+            del openai_api_key
