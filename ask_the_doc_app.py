@@ -30,14 +30,15 @@ def generate_response(uploaded_file, openai_api_key, query_text):
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=retriever)
+        retriever=retriever
+    )
 
     result = qa_chain.invoke({"query": query_text})
 
-if isinstance(result, dict):
-    return result.get("result", str(result))
+    if isinstance(result, dict):
+        return result.get("result", str(result))
 
-return str(result)
+    return str(result)
 
 st.set_page_config(page_title="Ask the Doc App")
 st.title("Ask the Doc App")
