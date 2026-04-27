@@ -9,14 +9,11 @@ from langchain_classic.chains import RetrievalQA
 def generate_response(uploaded_file, openai_api_key, query_text):
     #Read uploaded text file
     document_text = uploaded_file.read().decode("utf-8")
-
-    # Split document into smaller chunks
+    # Splittin DocumENTS
     text_splitter = CharacterTextSplitter(
         chunk_size=1000,
-        chunk_overlap=0
-    )
+        chunk_overlap=0)
     documents = text_splitter.create_documents([document_text])
-
     # Create embeddings(doc chunks)
     embeddings = OpenAIEmbeddings(
         openai_api_key=openai_api_key,
@@ -36,8 +33,11 @@ def generate_response(uploaded_file, openai_api_key, query_text):
         retriever=retriever)
 
     result = qa_chain.invoke({"query": query_text})
-    return result["result"]
 
+if isinstance(result, dict):
+    return result.get("result", str(result))
+
+return str(result)
 
 st.set_page_config(page_title="Ask the Doc App")
 st.title("Ask the Doc App")
@@ -69,6 +69,8 @@ with st.form("question_form", clear_on_submit=False):
             st.error("Please enter a valid OpenAI API key.")
         else:
             with st.spinner("Generating answer..."):
-                answer = generate_response(uploaded_file, openai_api_key, query_text)
-                st.info(answer)
-            del openai_api_key
+    try:
+        answer = generate_response(uploaded_file, openai_api_key, query_text)
+        st.info(answer)
+    except Exception as e:
+        st.error(f"{type(e).__name__}: {e}")
